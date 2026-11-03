@@ -2,6 +2,35 @@ const HUB_REPO = "nymlc/nymlc.github.io";
 const FINDERX_TAG_PREFIX = "finderx-v";
 const RELEASES_URL = `https://github.com/${HUB_REPO}/releases`;
 
+function setupRevealAnimations() {
+  const elements = [...document.querySelectorAll("[data-reveal]")];
+  if (!elements.length) return;
+
+  elements.forEach((element) => {
+    const delay = Number(element.dataset.revealDelay || 0);
+    element.style.setProperty("--reveal-delay", `${Math.min(delay, 280)}ms`);
+  });
+
+  if (
+    !("IntersectionObserver" in window) ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    elements.forEach((element) => element.classList.add("is-visible"));
+    return;
+  }
+
+  document.documentElement.classList.add("motion-ready");
+  const observer = new IntersectionObserver((entries, currentObserver) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      currentObserver.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -36px 0px" });
+
+  elements.forEach((element) => observer.observe(element));
+}
+
 function formatReleaseDate(value) {
   if (!value) return "";
   return new Intl.DateTimeFormat("zh-CN", {
@@ -115,4 +144,5 @@ document.querySelectorAll("#current-year").forEach((element) => {
   element.textContent = new Date().getFullYear();
 });
 
+setupRevealAnimations();
 loadFinderXRelease();

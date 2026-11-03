@@ -1,6 +1,6 @@
 # nymlc.github.io
 
-nymlc 的统一项目介绍与下载入口，使用原生 HTML、CSS 和少量 JavaScript，并通过 GitHub Pages 部署。
+nymlc 的统一项目介绍与下载入口，使用原生 HTML、CSS 和少量 JavaScript，并通过 GitHub Pages 部署。页面包含滚动显现、轻量悬浮和悬停动效，同时尊重系统的“减少动态效果”设置。
 
 ## 当前项目
 
@@ -8,7 +8,7 @@ nymlc 的统一项目介绍与下载入口，使用原生 HTML、CSS 和少量 J
 - [FinderX 下载页](https://nymlc.github.io/projects/finderx/download.html)
 - [FinderX 权限与数据说明](https://nymlc.github.io/projects/finderx/privacy.html)
 
-FinderX 应用源码保存在独立仓库；此仓库只包含网站内容、展示资源和发行版附件。
+FinderX 应用源码保存在独立仓库；此仓库只包含网站内容、展示资源和发行版附件。FinderX 介绍页使用真实应用界面截图（`assets/finderx-real-history-settings.png`），功能卡片采用抽象装饰，不再用仿制界面冒充产品截图。
 
 ## 更新网站
 

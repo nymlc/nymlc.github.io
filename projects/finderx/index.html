@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f3f5f6">
+    <meta name="theme-color" content="#101412">
     <meta name="description" content="FinderX 是一款 macOS Finder 辅助工具，让常用位置、最近记录与文件操作触手可及。">
     <meta property="og:type" content="website">
     <meta property="og:title" content="FinderX — 常用位置，就在 Finder 边上">
@@ -14,8 +14,8 @@
     <link rel="stylesheet" href="/assets/styles.css">
     <script src="/assets/site.js" defer></script>
   </head>
-  <body>
-    <header class="site-header">
+  <body class="finderx-page">
+    <header class="site-header site-header-dark">
       <a class="brand" href="/" aria-label="nymlc Projects 首页">
         <span class="brand-mark" aria-hidden="true">n</span>
         <span class="brand-name">nymlc <span>PROJECTS</span></span>
@@ -23,88 +23,103 @@
       <nav class="main-nav" aria-label="主导航">
         <a href="/">所有项目</a>
         <a href="#features">功能</a>
-        <a class="nav-download" href="/projects/finderx/download.html">下载 FinderX <span aria-hidden="true">↓</span></a>
+        <a class="nav-download" href="/projects/finderx/download.html">获取 FinderX <span aria-hidden="true">↗</span></a>
       </nav>
     </header>
 
     <main>
       <section class="product-hero section-wrap">
-        <div class="product-copy">
-          <a class="back-link" href="/"><span aria-hidden="true">←</span> 所有项目</a>
-          <div class="product-kicker"><span class="status-dot"></span> 为 macOS Finder 打造</div>
-          <h1>常用位置，<br><span>就在 Finder 边上。</span></h1>
-          <p>快速回到最近访问的文件夹，切换已打开的位置；需要时，用 AI 给文件名一些灵感，或用二维码把文件传到同一局域网的设备。</p>
+        <div class="product-copy" data-reveal>
+          <a class="back-link" href="/"><span aria-hidden="true">←</span> nymlc Projects</a>
+          <div class="product-kicker"><span class="status-dot"></span> A BETTER FLOW FOR FINDER</div>
+          <h1>文件切换，<br><span>不必绕远路。</span></h1>
+          <p>常用位置、最近记录与快捷操作，就在 Finder 旁边。少一点窗口间的来回，多一点顺手。</p>
           <div class="hero-actions">
-            <a class="button button-dark" href="/projects/finderx/download.html">
-              获取 FinderX
+            <a class="button button-lime" href="/projects/finderx/download.html">
+              查看下载
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
             </a>
-            <a class="button button-outline" href="#features">了解功能</a>
+            <a class="button button-glass" href="#features">探索功能 <span aria-hidden="true">↓</span></a>
           </div>
-          <div class="product-platform"><span class="apple-mark" aria-hidden="true">●</span> macOS 11+ <i></i> Apple Silicon</div>
+          <div class="product-platform"><span class="apple-mark" aria-hidden="true">●</span> macOS 11+ <i></i> Apple Silicon <i></i> 原生 macOS 应用</div>
         </div>
-        <div class="product-visual">
+
+        <div class="product-visual" data-reveal data-reveal-delay="140">
           <div class="product-visual-glow"></div>
-          <div class="product-icon-card"><img src="/assets/finderx-icon.png" alt="FinderX 应用图标"></div>
-          <div class="product-float-card float-card-top"><span class="float-spark">✳</span><div><b>文件夹历史</b><small>最多保留 100 条记录</small></div></div>
-          <div class="product-float-card float-card-bottom"><span class="float-arrows">↔</span><div><b>Finder 导航</b><small>键盘也能顺畅切换</small></div></div>
-          <div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
-          <div class="visual-caption">少一些打断，多一些顺手。</div>
+          <div class="visual-orbit orbit-one"></div>
+          <div class="visual-orbit orbit-two"></div>
+          <figure class="product-shot product-shot-settings">
+            <img
+              src="/assets/finderx-real-history-settings.png"
+              width="666"
+              height="606"
+              alt="FinderX macOS 应用的真实设置窗口，展示最近文件夹和最近文件的数量配置"
+              fetchpriority="high"
+            >
+            <figcaption>真实应用截图 · FinderX / 历史记录</figcaption>
+          </figure>
         </div>
+        <a class="hero-scroll product-scroll" href="#features" aria-label="向下浏览功能">
+          <span>SCROLL TO EXPLORE</span><i aria-hidden="true"></i>
+        </a>
       </section>
 
       <section class="feature-section section-wrap" id="features">
-        <div class="section-heading">
-          <div><div class="eyebrow eyebrow-muted">MADE FOR YOUR FLOW</div><h2>把常用操作，<br class="mobile-only">放近一点。</h2></div>
-          <p>FinderX 不替代 Finder，而是在你需要的时候，提供一条更短的路径。</p>
+        <div class="section-heading" data-reveal>
+          <div><div class="eyebrow eyebrow-muted">MADE FOR YOUR FLOW</div><h2>把常用操作，<br class="mobile-only">放近一点<span class="heading-period">.</span></h2></div>
+          <p>FinderX 不替代 Finder，而是在你需要的时候，给你一条更短的路径。</p>
         </div>
         <div class="feature-grid">
-          <article class="feature-card feature-card-large">
-            <span class="feature-number">01</span>
+          <article class="feature-card feature-card-large feature-card-history" data-reveal>
+            <span class="feature-number">01 / FINDERX</span>
+            <div class="feature-card-orb" aria-hidden="true"></div>
             <div class="feature-icon feature-icon-purple">⌂</div>
             <h3>常用位置与最近记录</h3>
             <p>从贴边工具栏或菜单栏入口，访问收藏、最近打开的文件夹与文件。历史列表和当前已打开位置分开呈现。</p>
-            <div class="feature-illustration recent-illustration" aria-hidden="true">
-              <span><i class="mini-folder lavender"></i> FinderX 项目 <small>刚刚</small></span>
-              <span><i class="mini-folder green"></i> 设计资料 <small>今天</small></span>
-              <span><i class="mini-folder orange"></i> 周末计划 <small>昨天</small></span>
-            </div>
+            <div class="feature-tags"><span>收藏</span><span>最近文件夹</span><span>最近文件</span></div>
+            <span class="feature-watermark" aria-hidden="true">01</span>
           </article>
-          <article class="feature-card">
-            <span class="feature-number">02</span>
+          <article class="feature-card feature-card-navigation" data-reveal data-reveal-delay="70">
+            <span class="feature-number">02 / NAVIGATION</span>
+            <div class="feature-card-orb" aria-hidden="true"></div>
             <div class="feature-icon feature-icon-blue">↔</div>
             <h3>Finder 导航</h3>
-            <p>在图标视图的行首、行尾继续使用左右方向键；支持跨行与 Shift 扩选，不可靠时交还 Finder 原生处理。</p>
-            <div class="key-illustration" aria-hidden="true"><kbd>⇧</kbd><kbd>←</kbd><kbd>→</kbd><span>继续浏览</span></div>
+            <p>在图标视图的行首、行尾继续使用方向键；支持跨行与 Shift 扩选，不可靠时交还 Finder 原生处理。</p>
+            <div class="feature-tags"><span>方向键</span><span>跨行移动</span><span>Shift 扩选</span></div>
+            <span class="feature-watermark" aria-hidden="true">02</span>
           </article>
-          <article class="feature-card">
-            <span class="feature-number">03</span>
+          <article class="feature-card feature-card-share" data-reveal>
+            <span class="feature-number">03 / LOCAL SHARE</span>
+            <div class="feature-card-orb" aria-hidden="true"></div>
             <div class="feature-icon feature-icon-green">⌁</div>
             <h3>局域网扫码传输</h3>
             <p>从 FinderX 右键菜单创建临时二维码，另一台设备扫码即可下载。文件只在当前局域网设备间传输。</p>
-            <div class="share-illustration" aria-hidden="true"><span class="qr-art"></span><span class="share-dash">······</span><span class="phone-art"><i></i><i></i><i></i></span></div>
+            <div class="feature-tags"><span>Finder 右键</span><span>临时链接</span><span>扫码下载</span></div>
+            <span class="feature-watermark" aria-hidden="true">03</span>
           </article>
-          <article class="feature-card">
-            <span class="feature-number">04</span>
+          <article class="feature-card feature-card-ai" data-reveal data-reveal-delay="70">
+            <span class="feature-number">04 / AI NAMING</span>
+            <div class="feature-card-orb" aria-hidden="true"></div>
             <div class="feature-icon feature-icon-orange">✳</div>
             <h3>AI 文件命名</h3>
             <p>在重命名或另存为时生成候选名称。你可以配置兼容服务、选择模型，并在发送前查看本次请求内容。</p>
-            <div class="rename-illustration" aria-hidden="true"><span>IMG_2048</span><b>→</b><span class="rename-result">海边日落</span></div>
+            <div class="feature-tags"><span>你来配置</span><span>发送前预览</span><span>钥匙串保护</span></div>
+            <span class="feature-watermark" aria-hidden="true">04</span>
           </article>
         </div>
       </section>
 
-      <section class="privacy-band section-wrap">
+      <section class="privacy-band section-wrap" data-reveal>
         <div class="privacy-symbol" aria-hidden="true">⌑</div>
-        <div><div class="eyebrow eyebrow-muted">TRANSPARENT BY DESIGN</div><h2>权限与数据，<br class="mobile-only">尽量说清楚。</h2></div>
-        <p>FinderX 使用 macOS 辅助功能等系统权限读取必要的窗口信息。AI 功能由你主动触发，发送内容随设置选项变化；绝对文件路径用于本机读取，不会放入命名提示词。API Key 保存在 macOS 钥匙串中。</p>
-        <a class="text-link" href="/projects/finderx/privacy.html">了解数据处理说明 <span aria-hidden="true">→</span></a>
+        <div><div class="eyebrow eyebrow-muted">TRANSPARENT BY DESIGN</div><h2>权限与数据，<br class="mobile-only">清楚、可控。</h2></div>
+        <p>FinderX 的核心能力在本机运行。AI 命名由你主动触发；局域网分享也只在你创建分享时启动。需要的系统权限和数据处理方式都写在这里。</p>
+        <a class="text-link" href="/projects/finderx/privacy.html">查看权限与数据说明 <span aria-hidden="true">→</span></a>
       </section>
 
-      <section class="download-cta section-wrap">
+      <section class="download-cta section-wrap" data-reveal>
         <div class="cta-icon"><img src="/assets/finderx-icon.png" alt=""></div>
-        <div class="cta-copy"><div class="eyebrow">FINDERX FOR MAC</div><h2>准备好试试了吗？</h2><p data-release-summary>首个公开版本准备中，发布后可在这里获取。</p></div>
-        <a class="button button-light cta-button" href="/projects/finderx/download.html">查看下载 <span aria-hidden="true">→</span></a>
+        <div class="cta-copy"><div class="eyebrow">FINDERX FOR MAC</div><h2>让 Finder 工作流更顺一点。</h2><p data-release-summary>首个公开版本准备中，发布后可在这里获取。</p></div>
+        <a class="button button-lime cta-button" href="/projects/finderx/download.html">查看下载 <span aria-hidden="true">→</span></a>
       </section>
     </main>
 
