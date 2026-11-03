@@ -43,6 +43,10 @@ async function loadFinderXRelease() {
   const state = document.querySelector("[data-release-state]");
   if (!state && !document.querySelector("[data-release-summary]")) return;
 
+  if (state) state.textContent = "正在检查最新版本…";
+  const initialButton = document.querySelector("[data-finderx-download]");
+  if (initialButton) initialButton.textContent = "正在检查版本";
+
   try {
     const response = await fetch(
       `https://api.github.com/repos/${HUB_REPO}/releases?per_page=100`,

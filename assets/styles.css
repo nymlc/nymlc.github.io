@@ -352,12 +352,12 @@ h1, h2, h3, p { margin-top: 0; }
 .info-number { color: #a6afb2; font: 9px var(--mono); }
 .info-heading h2 { margin: 0; font-size: 13px; font-weight: 600; }
 .requirements-list { margin: 0; padding: 0; list-style: none; }
-.requirements-list li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 9px; }
+.requirements-list li { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 10px; }
 .requirements-list li span { color: #899499; }
 .requirements-list li b { color: #4e5c62; font-weight: 500; text-align: right; }
-.subtle-note { margin: 8px 0 0; color: #a1a9ad; font-size: 8px; }
+.subtle-note { margin: 8px 0 0; color: #a1a9ad; font-size: 9px; }
 .install-steps { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.install-steps li { display: flex; align-items: center; gap: 10px; color: #727f85; font-size: 9px; }
+.install-steps li { display: flex; align-items: center; gap: 10px; color: #727f85; font-size: 10px; }
 .install-steps li > span { width: 19px; height: 19px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; color: #728086; font: 8px var(--mono); }
 .install-steps p { margin: 0; }
 .install-steps b { color: #49575d; font-weight: 600; }
@@ -365,7 +365,7 @@ h1, h2, h3, p { margin-top: 0; }
 .download-help > div { display: flex; align-items: center; gap: 11px; }
 .help-mark { width: 25px; height: 25px; display: grid; place-items: center; border: 1px solid rgba(48,67,77,.14); border-radius: 50%; color: #7d8b90; font: 11px var(--mono); }
 .download-help b { display: block; margin-bottom: 3px; color: #58656b; font-size: 9px; font-weight: 600; }
-.download-help p { margin: 0; color: #899499; font-size: 8px; }
+.download-help p { margin: 0; color: #899499; font-size: 9px; }
 
 .privacy-page { padding-top: 38px; padding-bottom: 72px; }
 .privacy-intro { display: flex; align-items: flex-start; gap: 15px; margin: 27px 0 34px; padding: 19px 21px; border-radius: 10px; background: #e8ecee; }
@@ -421,7 +421,7 @@ h1, h2, h3, p { margin-top: 0; }
   .hub-hero { padding-top: 43px; padding-bottom: 33px; min-height: auto; }
   .hero-copy h1 { margin: 22px 0 13px; font-size: clamp(35px, 10vw, 47px); letter-spacing: -1.8px; }
   .hero-copy > p { font-size: 12px; line-height: 1.85; }
-  .hero-meta { gap: 12px; margin-top: 24px; font-size: 8px; }
+  .hero-meta { gap: 12px; margin-top: 24px; font-size: 9px; }
   .hero-art { min-height: 310px; margin-top: 18px; }
   .finder-window { width: 94%; min-height: 246px; border-radius: 10px; }
   .finder-titlebar { height: 36px; }
@@ -446,28 +446,28 @@ h1, h2, h3, p { margin-top: 0; }
   .project-icon-wrap, .project-icon-wrap img { width: 58px; height: 58px; }
   .project-icon-wrap img { border-radius: 15px; }
   .project-info h3 { margin-top: 7px; font-size: 18px; }
-  .project-info p { font-size: 10px; line-height: 1.7; }
+  .project-info p { font-size: 11px; line-height: 1.75; }
   .tag-list { gap: 4px; margin-top: 9px; }
-  .tag-list span { padding: 4px 6px; font-size: 7px; }
+  .tag-list span { padding: 4px 6px; font-size: 8px; }
   .project-arrow { margin-top: 0; font-size: 15px; }
-  .project-card-footer { min-height: 43px; padding: 0 14px; font-size: 8px; }
-  .project-card-footer .text-link { font-size: 8px; }
+  .project-card-footer { min-height: 43px; padding: 0 14px; font-size: 9px; }
+  .project-card-footer .text-link { font-size: 9px; }
   .future-note { gap: 10px; min-height: 74px; padding: 13px; }
-  .future-note p { max-width: 210px; font-size: 8px; line-height: 1.6; }
+  .future-note p { max-width: 210px; font-size: 9px; line-height: 1.6; }
   .future-index { font-size: 7px; }
   .about-strip { grid-template-columns: 35px 1fr 30px; gap: 10px; margin-top: 14px; margin-bottom: 52px; padding: 18px 15px; }
   .about-mark { font-size: 32px; }
   .about-strip h2 { font-size: 14px; }
-  .about-strip p { font-size: 8px; }
+  .about-strip p { font-size: 9px; }
   .round-link { width: 29px; height: 29px; }
-  .site-footer { min-height: 70px; flex-wrap: wrap; justify-content: space-between; padding: 13px 0; font-size: 8px; }
+  .site-footer { min-height: 70px; flex-wrap: wrap; justify-content: space-between; padding: 13px 0; font-size: 9px; }
   .site-footer > span { order: 3; width: 100%; }
   .brand-footer .brand-name { font-size: 10px; }
 
   .product-hero { padding-top: 23px; padding-bottom: 30px; }
   .product-kicker { margin-top: 25px; font-size: 9px; }
   .product-copy h1 { margin: 15px 0 12px; font-size: 39px; letter-spacing: -1.8px; }
-  .product-copy > p { font-size: 10px; line-height: 1.9; }
+  .product-copy > p { font-size: 11px; line-height: 1.9; }
   .product-platform { margin-top: 20px; font-size: 8px; }
   .product-visual { min-height: 310px; }
   .product-icon-card { width: 157px; height: 157px; border-radius: 36px; }
@@ -486,47 +486,47 @@ h1, h2, h3, p { margin-top: 0; }
   .feature-grid { grid-template-columns: 1fr; gap: 9px; }
   .feature-card, .feature-card-large { min-height: 225px; padding: 18px; }
   .feature-card h3 { font-size: 13px; }
-  .feature-card > p { font-size: 9px; }
+  .feature-card > p { font-size: 10px; }
   .privacy-band { grid-template-columns: 34px 1fr; gap: 12px; margin-bottom: 35px; padding: 19px 15px; }
   .privacy-symbol { width: 32px; height: 32px; font-size: 18px; }
   .privacy-band h2 { font-size: 13px; }
-  .privacy-band > p { font-size: 8px; }
-  .privacy-band .text-link { font-size: 8px; }
+  .privacy-band > p { font-size: 9px; }
+  .privacy-band .text-link { font-size: 9px; }
   .download-cta { gap: 12px; min-height: 105px; margin-bottom: 40px; padding: 16px 13px; }
   .cta-icon { width: 41px; height: 41px; border-radius: 11px; }
   .cta-copy .eyebrow { font-size: 6px; }
   .cta-copy h2 { font-size: 13px; }
-  .cta-copy p { font-size: 7px; line-height: 1.5; }
+  .cta-copy p { font-size: 8px; line-height: 1.5; }
   .cta-button { min-width: 80px; min-height: 36px; padding: 0 9px; gap: 4px; font-size: 8px; }
 
   .download-page { padding-top: 25px; padding-bottom: 45px; }
   .download-heading { margin: 31px 0 19px; }
   .download-heading h1 { font-size: 31px; }
-  .download-heading > p { font-size: 10px; }
+  .download-heading > p { font-size: 11px; }
   .release-card { padding: 17px 14px 14px; }
   .release-card-top { gap: 11px; flex-wrap: wrap; }
   .release-icon { width: 43px; height: 43px; border-radius: 10px; }
   .release-details { min-width: 180px; }
   .release-details h2 { font-size: 13px; }
-  .release-details p { font-size: 8px; }
+  .release-details p { font-size: 9px; }
   .release-badge { margin-left: 54px; font-size: 7px; }
   .release-card-actions { gap: 7px; margin: 18px 0 10px; }
   .release-card-actions .button { min-width: 0; min-height: 38px; flex: 1; padding: 0 9px; gap: 6px; font-size: 8px; }
-  .release-footnote { margin: 0; font-size: 7px; }
+  .release-footnote { margin: 0; font-size: 8px; }
   .download-columns { grid-template-columns: 1fr; gap: 9px; margin-top: 12px; }
   .download-info { padding: 16px; }
   .download-help { align-items: flex-start; flex-direction: column; padding: 14px; }
   .download-help > .text-link { margin-left: 36px; }
   .privacy-page { padding-top: 25px; padding-bottom: 45px; }
   .privacy-intro { gap: 10px; margin: 22px 0 23px; padding: 15px; }
-  .privacy-intro > p { font-size: 9px; }
+  .privacy-intro > p { font-size: 10px; }
   .privacy-topic { padding: 18px 0; }
   .privacy-topic-grid { grid-template-columns: 1fr; gap: 7px; }
   .privacy-topic-grid article { padding: 13px; }
-  .privacy-topic-grid p, .privacy-prose p { font-size: 8px; }
+  .privacy-topic-grid p, .privacy-prose p { font-size: 9px; }
   .privacy-prose { gap: 9px; padding-left: 0; }
   .privacy-footer-note { padding: 12px; }
-  .privacy-footer-note > p { font-size: 8px; }
+  .privacy-footer-note > p { font-size: 9px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
