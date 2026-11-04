@@ -116,7 +116,7 @@ onBeforeUnmount(() => {
             class="scene-poster"
             :src="scene.src"
             :srcset="`${scene.srcSm} 1000w, ${scene.src} 2000w`"
-            sizes="(max-width: 900px) 100vw, 1360px"
+            sizes="(max-width: 680px) calc(100vw - 24px), (max-width: 900px) calc(100vw - 48px), (max-width: 1800px) 92vw, 1600px"
             width="2000"
             height="1036"
             :alt="scene.alt"
@@ -128,11 +128,14 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="scene-caption">
-          <h1>nymlc Projects</h1>
-          <p class="scene-sub">把日常的小麻烦，做成顺手的独立应用。</p>
-          <p class="scene-sub scene-sub-soft">{{ scene.line }}</p>
-          <p class="scene-note">{{ scene.note }}</p>
-          <a class="scene-cue" href="#projects">沿着田野，看看我做的应用 <span aria-hidden="true">↓</span></a>
+          <div class="scene-caption-copy">
+            <h1>nymlc Projects</h1>
+            <p class="scene-sub">把日常的小麻烦，做成顺手的独立应用。<span class="scene-sub-detail">{{ scene.line }}</span></p>
+          </div>
+          <div class="scene-caption-meta">
+            <p class="scene-note">{{ scene.note }}</p>
+            <a class="scene-cue" href="#projects">看看我做的应用 <span aria-hidden="true">↓</span></a>
+          </div>
         </div>
       </section>
 

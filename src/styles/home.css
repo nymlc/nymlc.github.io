@@ -22,22 +22,19 @@ body.is-home { background: #fff; }
   align-items: center;
   justify-content: space-between;
   height: 68px;
-  padding-inline: max(28px, calc((100vw - 1360px) / 2));
+  padding-inline: max(clamp(24px, 4vw, 72px), calc((100vw - 1600px) / 2));
 }
 .home-bar .brand-copy strong { color: var(--ink); }
 .home-bar-link { color: #4e6b55; font-size: 13px; font-weight: 500; letter-spacing: .06em; white-space: nowrap; transition: color .2s ease; }
 .home-bar-link:hover { color: var(--leaf-deep); }
 
-/* Wide scene: poster first, live WebGL canvas fades in over it */
-.scene-hero { display: flex; flex-direction: column; align-items: center; padding: 4px 28px 0; }
+/* Wide scene: broad, cinematic river view; poster first, then live WebGL fades in */
+.scene-hero { display: flex; flex-direction: column; align-items: center; padding: 4px clamp(24px, 4vw, 72px) 0; }
 .scene-stage {
   position: relative;
-  width: min(1360px, 100%, max(560px, calc((100vh - 235px) * 1.93)));
-  aspect-ratio: 2000 / 1036;
+  width: min(1600px, 100%);
+  aspect-ratio: 2.6 / 1;
   animation: stage-in 1.2s cubic-bezier(.2, .7, .2, 1) both;
-}
-@supports (height: 100svh) {
-  .scene-stage { width: min(1360px, 100%, max(560px, calc((100svh - 235px) * 1.93))); }
 }
 .scene-poster, .scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .scene-poster { object-fit: cover; pointer-events: none; user-select: none; }
@@ -45,19 +42,29 @@ body.is-home { background: #fff; }
 .scene-stage.is-live .scene-canvas { opacity: 1; }
 @keyframes stage-in { from { opacity: 0; transform: translateY(18px) scale(.985); } to { opacity: 1; transform: none; } }
 
-.scene-caption { width: min(720px, 100%); padding-top: 8px; text-align: center; }
+/* One calm caption row keeps the hero compact without shrinking the artwork */
+.scene-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: min(1600px, 100%);
+  padding: 16px 4px 0;
+}
+.scene-caption-copy { min-width: 0; }
 .scene-caption h1 {
   margin: 0;
   color: var(--ink);
-  font: 400 clamp(28px, 3vw, 36px)/1.3 var(--serif);
-  letter-spacing: .3em;
-  text-indent: .3em;
+  font: 400 clamp(25px, 2.4vw, 34px)/1.25 var(--serif);
+  letter-spacing: .22em;
+  text-indent: .22em;
   animation: rise .9s .2s cubic-bezier(.2, .7, .2, 1) both;
 }
-.scene-sub { margin: 10px 0 0; color: var(--faint); font-size: 15px; line-height: 1.9; letter-spacing: .1em; animation: rise .9s .32s cubic-bezier(.2, .7, .2, 1) both; }
-.scene-sub-soft { margin-top: 0; animation: none; }
-.scene-note { margin: 8px 0 0; color: var(--ghost); font: 500 12px/1.6 var(--mono); letter-spacing: .14em; }
-.scene-cue { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; color: var(--leaf); font-size: 13px; letter-spacing: .1em; animation: rise .9s .5s cubic-bezier(.2, .7, .2, 1) both; transition: color .2s ease; }
+.scene-sub { margin: 6px 0 0; color: var(--faint); font-size: 14px; line-height: 1.7; letter-spacing: .06em; animation: rise .9s .32s cubic-bezier(.2, .7, .2, 1) both; }
+.scene-sub-detail { margin-left: 14px; color: var(--ghost); }
+.scene-caption-meta { display: flex; align-items: center; gap: clamp(18px, 3vw, 40px); flex: 0 0 auto; }
+.scene-note { margin: 0; color: var(--ghost); font: 500 11px/1.6 var(--mono); letter-spacing: .12em; white-space: nowrap; }
+.scene-cue { display: inline-flex; align-items: center; gap: 8px; color: var(--leaf); font-size: 13px; letter-spacing: .08em; animation: rise .9s .5s cubic-bezier(.2, .7, .2, 1) both; transition: color .2s ease; white-space: nowrap; }
 .scene-cue:hover { color: var(--leaf-deep); }
 .scene-cue span { animation: cue-bob 1.8s ease-in-out infinite; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
@@ -143,18 +150,27 @@ body.is-home { background: #fff; }
 
 @media (max-width: 900px) {
   .home-bar { padding-inline: 24px; }
-  .scene-hero { padding-inline: 20px; }
+  .scene-hero { padding-inline: 24px; }
+  .scene-caption { gap: 14px; }
+  .scene-sub-detail { display: block; margin-left: 0; }
+  .scene-caption-meta { gap: 16px; }
   .app-card { grid-template-columns: 1fr; gap: 34px; padding: 36px 32px; }
   .app-shot { width: min(100%, 460px); justify-self: center; }
 }
 @media (max-width: 680px) {
   .home-bar { height: 60px; padding-inline: 18px; }
   .home-bar-link { font-size: 12px; }
-  .scene-hero { padding: 6px 0 0; }
-  .scene-stage { width: 100%; aspect-ratio: 5 / 4; }
-  .scene-caption { padding: 10px 20px 0; }
-  .scene-sub { font-size: 14px; letter-spacing: .06em; }
+  .scene-hero { padding: 6px 12px 0; }
+  .scene-stage { width: 100%; aspect-ratio: 16 / 10; }
+  .scene-caption { align-items: stretch; flex-direction: column; gap: 10px; padding: 12px 4px 0; }
+  .scene-caption h1 { font-size: 25px; letter-spacing: .12em; text-indent: .12em; }
+  .scene-sub { font-size: 13px; letter-spacing: .03em; }
+  .scene-sub-detail { display: block; margin: 2px 0 0; }
+  .scene-caption-meta { align-items: center; justify-content: space-between; gap: 12px; }
+  .scene-note { font-size: 10px; }
+  .scene-cue { font-size: 12px; }
   .projects { width: calc(100% - 32px); padding-top: 60px; }
+  .projects-heading h2 { font-size: clamp(20px, 5.6vw, 22px); letter-spacing: .06em; }
   .app-card { gap: 28px; padding: 26px 20px; border-radius: 20px; }
   .app-head strong { font-size: 22px; }
   .app-desc { font-size: 14px; }
@@ -167,4 +183,7 @@ body.is-home { background: #fff; }
 @media (prefers-reduced-motion: reduce) {
   .scene-stage, .scene-caption h1, .scene-sub, .scene-cue { animation: none; }
   .scene-canvas { transition: none; }
+}
+@media (max-width: 360px) {
+  .projects-heading h2 { font-size: 18px; letter-spacing: .04em; }
 }
