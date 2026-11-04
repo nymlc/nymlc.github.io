@@ -141,9 +141,12 @@ onBeforeUnmount(() => {
 
       <section id="projects" class="projects">
         <div class="projects-heading" v-reveal>
-          <p class="section-eyebrow">PROJECTS</p>
-          <h2>在这里，遇见下一件趁手的工具</h2>
-          <p class="projects-lead">目前开放 1 个应用，更多正在生长。</p>
+          <div>
+            <p class="section-eyebrow">PROJECTS <span aria-hidden="true">/</span> 作品</p>
+            <h2>为日常，做趁手的工具。</h2>
+            <p class="projects-lead">目前开放 1 个应用，更多正在生长。</p>
+          </div>
+          <span class="projects-count" aria-label="共 1 个应用">01 <i aria-hidden="true">—</i> 01</span>
         </div>
 
         <article id="finderx" class="app-card" v-reveal="80">
@@ -153,21 +156,17 @@ onBeforeUnmount(() => {
               <span><strong>FinderX</strong><small>MACOS · FINDER 效率增强</small></span>
             </a>
             <p class="app-desc">把最近记录、Finder 导航、AI 命名和局域网扫码传输，放到你已经习惯的 Finder 旁边。少一点来回切换，多一点顺手。</p>
-            <div class="app-tags"><span>最近记录</span><span>Finder 导航</span><span>AI 命名</span><span>局域网扫码传输</span></div>
             <div class="app-actions">
               <a class="app-download" href="/projects/finderx/download.html"><span aria-hidden="true">↓</span> 下载 FinderX · macOS</a>
               <a class="app-more" href="/projects/finderx/">了解更多 <span aria-hidden="true">→</span></a>
             </div>
           </div>
-          <figure class="app-shot">
-            <img
-              src="/assets/finderx-real-history-settings.png"
-              width="666"
-              height="606"
-              alt="FinderX 真实应用截图：最近文件夹与最近文件数量设置"
-              loading="lazy"
-            >
-          </figure>
+          <ul class="app-features" aria-label="FinderX 功能">
+            <li>最近记录</li>
+            <li>Finder 导航</li>
+            <li>AI 命名</li>
+            <li>局域网扫码传输</li>
+          </ul>
         </article>
 
         <div class="app-next" v-reveal="140">
