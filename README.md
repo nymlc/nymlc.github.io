@@ -1,25 +1,47 @@
-# nymlc.github.io
+# nymlc Projects
 
-nymlc 的统一项目介绍与下载入口，使用原生 HTML、CSS 和少量 JavaScript，并通过 GitHub Pages 部署。页面包含滚动显现、轻量悬浮和悬停动效，同时尊重系统的“减少动态效果”设置。
+nymlc 的统一项目介绍与下载入口。网站使用 Vue 3、Vite 和 Three.js，以多页面结构构建并部署到 GitHub Pages。
 
-## 当前项目
+## 页面
 
-- [FinderX 项目介绍](https://nymlc.github.io/projects/finderx/)
-- [FinderX 下载页](https://nymlc.github.io/projects/finderx/download.html)
-- [FinderX 权限与数据说明](https://nymlc.github.io/projects/finderx/privacy.html)
+- `/`：应用总览，首屏是实时渲染的宽幅「草原河流」场景（WebGL），下方是项目卡片
+- `/projects/finderx/`：FinderX 项目介绍
+- `/projects/finderx/download.html`：正式版下载、系统要求和安装说明
+- `/projects/finderx/privacy.html`：权限与数据说明
 
-FinderX 应用源码保存在独立仓库；此仓库只包含网站内容、展示资源和发行版附件。FinderX 介绍页使用真实应用界面截图（`assets/finderx-real-history-settings.png`），功能卡片采用抽象装饰，不再用仿制界面冒充产品截图。
+## 首页实时场景
 
-## 更新网站
+首屏的草原河流是实时 WebGL 动画，源自 [cswfww123/wind-fields](https://github.com/cswfww123/wind-fields)，代码在 `src/windfields/`，目前只接入「草原河流」一个场景。
 
-向 `main` 分支推送后，`.github/workflows/pages.yml` 会自动部署网站。GitHub Pages 的发布来源需设置为 **GitHub Actions**。
+- 页面只用 `createWindFields(canvas)`；画布填满哪个容器，画面就跟着那个容器的尺寸走。
+- 首屏先显示 `public/assets/scenes/scene-grassland-river*.webp` 作海报，海报加载后才动态加载场景代码，第一帧渲染出来后画布淡入。
+- 以下情况只显示海报：浏览器不支持 WebGL2、系统开启「减少动态效果」、开启省流量模式。
+- 滚出视口会暂停渲染；帧率持续低于约 28fps 时会自动降低像素比。
+- 鼠标进入画面后飞机会飞向鼠标，点击左键翻滚；触屏设备只自动飞行。
+- 场景文件名里 `biome_river.js` 是地貌函数，`scenes.js` 是色板、植被、房子等配置；其他三个场景（蓝金田野、赤土荒野、碧海沙洲）暂未接入，`public/assets/scenes/` 里保留了它们的海报图。
+
+FinderX 介绍页和总览卡片使用真实应用界面截图。应用源码保存在独立仓库；本仓库只包含网站源码、展示资源和发行版入口。
+
+## 本地开发
+
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+生产构建与预览：
+
+```sh
+pnpm build
+pnpm preview
+```
+
+## GitHub Pages 部署
+
+向 `main` 分支推送后，`.github/workflows/pages.yml` 会安装依赖、构建 `dist/` 并将构建结果发布到 GitHub Pages。Pages 的发布来源需设为 **GitHub Actions**。
 
 ## 发布 FinderX 下载
 
-在本仓库创建正式 GitHub Release，标签使用 `finderx-v<版本号>`，例如 `finderx-v2026.11.03`，并附加文件名为 `FinderX.dmg` 的安装包。下载页会从公开 Release 列表中筛选 FinderX 的最新正式版；其他项目可使用自己的标签前缀，互不影响。
+在本仓库创建正式 GitHub Release，标签使用 `finderx-v<版本号>`，例如 `finderx-v2026.11.03`，并附加文件名为 `FinderX.dmg` 的安装包。下载页会筛选 FinderX 最新正式版；尚无正式版本时会展示准备中状态。
 
-建议每个正式版本在发布前完成 Developer ID 签名和 Apple 公证，并在 Release 说明中写明系统要求、更新内容和校验值。未发布正式版时，下载页会明确显示“首个公开版本准备中”，不会显示失效的直链。
-
-## 本仓库与应用源码
-
-这是公开的静态网站仓库。它不包含 FinderX 应用源码；公开网站仓库中的页面 HTML、CSS、脚本和展示图标可被访问。FinderX 应用源码仍由其独立仓库管理。
+建议每个正式版本在发布前完成 Developer ID 签名和 Apple 公证，并在 Release 说明中写明系统要求、更新内容和校验值。

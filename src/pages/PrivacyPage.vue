@@ -1,0 +1,60 @@
+<script setup>
+import SiteHeader from '../components/SiteHeader.vue';
+import SiteFooter from '../components/SiteFooter.vue';
+</script>
+
+<template>
+  <div>
+    <SiteHeader />
+    <main class="privacy-page section-wrap">
+      <a class="back-link" href="/projects/finderx/">← <span>返回 FinderX</span></a>
+      <div class="page-heading" v-reveal>
+        <p class="section-eyebrow">PERMISSIONS &amp; DATA</p>
+        <h1>权限与数据说明</h1>
+        <p>说明 FinderX 为什么需要系统权限、哪些内容会离开本机。</p>
+      </div>
+
+      <div class="privacy-intro" v-reveal>
+        <span class="privacy-symbol">⌑</span>
+        <p>FinderX 的核心能力在本机运行。需要跨应用读取或控制 Finder 时，应用会通过 macOS 提供的权限与 API 完成；不会把文件夹或文件内容上传到 FinderX 云端。</p>
+      </div>
+
+      <section class="privacy-topic" v-reveal>
+        <div class="info-heading"><span>01</span><h2>系统权限</h2></div>
+        <div class="privacy-topic-grid">
+          <article><h3>辅助功能</h3><p>用于读取必要的窗口与控件信息，定位工具栏，并执行部分跨应用操作。可在“系统设置 → 隐私与安全性 → 辅助功能”管理授权。</p></article>
+          <article><h3>自动化 · Finder</h3><p>用于读取 Finder 窗口和项目、目录跳转及最近文件记录。Finder 导航功能本身不依赖此权限。</p></article>
+          <article><h3>输入监控</h3><p>仅在启用 Finder 导航时需要，用于接收 Finder 的方向键输入；不影响 FinderX 的其他功能。</p></article>
+        </div>
+      </section>
+
+      <section class="privacy-topic" v-reveal>
+        <div class="info-heading"><span>02</span><h2>AI 文件命名</h2></div>
+        <div class="privacy-prose">
+          <p>AI 命名由用户主动触发。请求发送到你在设置中选择的 AI 服务，具体数据取决于启用的选项，可能包括文件名主体、扩展名或文件类型、输入描述、同目录文件名参考，以及用户主动启用图片分析后处理过的图片。</p>
+          <p><b>绝对文件路径仅用于本机读取，不会放进命名提示词发送给 AI 服务。</b>关闭图片分析时不会附加图片；当前文件名参考和同级文件名参考均可在设置中控制。发送前可检查本次请求内容。</p>
+          <p>API Key 保存在 macOS 钥匙串中。AI 服务会按自身隐私政策处理收到的请求内容；请在使用前确认你信任所配置的服务。</p>
+        </div>
+      </section>
+
+      <section class="privacy-topic" v-reveal>
+        <div class="info-heading"><span>03</span><h2>局域网传输</h2></div>
+        <div class="privacy-prose">
+          <p>扫码分享只在用户从 FinderX 右键菜单创建分享时启动。下载链接仅用于当前局域网内的临时传输，文件内容不经过 FinderX 云端。</p>
+          <p>分享会按设置中的有效期自动结束；也可在下载完成后立即停止分享。请只将二维码分享给你信任的设备和人员。</p>
+        </div>
+      </section>
+
+      <section class="privacy-topic" v-reveal>
+        <div class="info-heading"><span>04</span><h2>历史记录与诊断</h2></div>
+        <div class="privacy-prose">
+          <p>最近文件夹和最近文件列表保存在本机。最近文件夹基于运行期间观察到的 Finder 位置；最近文件受 Spotlight 索引与 macOS 暴露信息影响，不保证覆盖所有文件。</p>
+          <p>诊断信息由用户主动导出，不会自动上传。导出内容可能包含应用名称、操作时间或运行信息；分享前请自行检查。</p>
+        </div>
+      </section>
+
+      <div class="privacy-footer-note" v-reveal><span>i</span><p>FinderX 需要的权限可在 macOS 系统设置中随时调整。关闭某项可选功能后，与该功能相关的权限不再用于对应操作。</p></div>
+    </main>
+    <SiteFooter note="FinderX · 权限与数据说明" />
+  </div>
+</template>
