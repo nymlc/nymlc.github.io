@@ -3,7 +3,10 @@ import * as THREE from 'three';
 import { LOOP, wrapNear } from './config.js';
 import { curveX, curveDX } from './curves.js';
 import { litUniforms, SHADE_VERT, SHADE_FRAG } from './shading.js';
-import { houseWalls, houseRoof, carGeo, busGeo, cowGeo, sheepGeo, boatGeo, poleGeo } from './props_geo.js';
+import {
+  houseWalls, houseRoof, jiangnanHouseWalls, jiangnanHouseRoof,
+  carGeo, busGeo, cowGeo, sheepGeo, boatGeo, wupengBoatGeo, bridgeGeo, poleGeo,
+} from './props_geo.js';
 
 const VERT = /* glsl */ `
 ${SHADE_VERT}
@@ -51,10 +54,11 @@ function shadowy(o) {
 }
 
 export class Houses {
-  constructor(list, mat) {
+  constructor(list, mat, architecture) {
     this.group = new THREE.Group();
-    this.walls = houseWalls();
-    this.roof = houseRoof();
+    const jiangnan = architecture === 'jiangnan';
+    this.walls = jiangnan ? jiangnanHouseWalls() : houseWalls();
+    this.roof = jiangnan ? jiangnanHouseRoof() : houseRoof();
     this.chunks = [];
     const CH = 32;
     const m = new THREE.Matrix4();
@@ -253,15 +257,16 @@ export class Herds {
   dispose() { Object.values(this.geos).forEach((g) => g.dispose()); }
 }
 
-/** 帆船：慢慢漂，快撞到岸就转向 */
+/** 帆船/乌篷船：慢慢漂，快撞到岸就转向 */
 export class Boats {
-  constructor(boats, mat, field) {
+  constructor(boats, mat, field, style) {
     this.group = new THREE.Group();
     this.field = field;
-    this.geo = boatGeo();
+    const wupeng = style === 'wupeng';
+    this.geo = wupeng ? wupengBoatGeo() : boatGeo();
     this.list = boats.map((b) => {
       const mesh = shadowy(new THREE.Mesh(this.geo, mat));
-      mesh.scale.setScalar(0.9);
+      mesh.scale.setScalar(b.scale ?? (wupeng ? 1.8 : 0.9));
       this.group.add(mesh);
       return { ...b, mesh, z: b.z };
     });
@@ -280,4 +285,33 @@ export class Boats {
   }
 
   dispose() { this.geo.dispose(); }
+}
+
+/** 石拱桥：桥位沿道路曲线定位，z 方向循环时始终显示离镜头最近的一座。 */
+export class Bridges {
+  constructor(cfg, mat, field) {
+    this.group = new THREE.Group();
+    this.field = field;
+    this.list = (cfg.bridges ?? []).map((b) => {
+      const curve = cfg.curves[b.road];
+      const z = b.z ?? 0;
+      const slope = curveDX(curve, z);
+      const x = curveX(curve, z);
+      const geo = bridgeGeo(b.length ?? 26, b.width ?? 6.2);
+      const mesh = shadowy(new THREE.Mesh(geo, mat));
+      mesh.rotation.y = -Math.atan2(1, slope);
+      this.group.add(mesh);
+      return { mesh, geo, x, z, y: b.y ?? 0.03 };
+    });
+  }
+
+  update(refZ) {
+    for (const b of this.list) {
+      b.mesh.position.set(b.x, b.y, wrapNear(b.z, refZ));
+    }
+  }
+
+  dispose() {
+    this.list.forEach((b) => b.geo.dispose());
+  }
 }

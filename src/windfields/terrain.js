@@ -92,8 +92,11 @@ void main() {
 `;
 
 export class Terrain {
-  constructor(tex) {
-    this.size = { x: 208, z: 230 };
+  constructor(tex, { depth = LOOP, centerZ = -30 } = {}) {
+    // 地形贴图沿 Z 周期重复；高山主题需要额外的近景余量，避免高海拔地表
+    // 与镜头近端相交时，恰好越过有限网格边缘而露出白色清屏背景。
+    this.size = { x: WORLD_W, z: depth };
+    this.centerZ = centerZ;
     this.step = 0.8;
     const nx = Math.round(this.size.x / this.step);
     const nz = Math.round(this.size.z / this.step);
@@ -122,7 +125,7 @@ export class Terrain {
   follow(fx, fz) {
     const s = this.step;
     const ox = Math.round(fx / s) * s;
-    const oz = Math.round((fz - 30) / s) * s;
+    const oz = Math.round((fz + this.centerZ) / s) * s;
     this.mat.uniforms.uOrigin.value.set(ox, oz);
   }
 

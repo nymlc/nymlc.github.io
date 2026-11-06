@@ -1,8 +1,8 @@
-// 风过荒野 · 草原河流：实时 WebGL 场景（移植自 cswfww123/wind-fields）。
+// 风过荒野：草原河流与海湾渔村的实时 WebGL 场景（移植自 cswfww123/wind-fields）。
 // 页面只需要 createWindFields(canvas)：画布填满哪个容器，画面就跟着那个容器的尺寸走。
 import * as THREE from 'three';
-import { river } from './scenes.js';
-import { LOOP, SUN_DIR } from './config.js';
+import { coast } from './scenes.js';
+import { LOOP, SUN_DIR, wrapNear } from './config.js';
 import { shared } from './shading.js';
 import { TerrainBaker } from './bake.js';
 import { World } from './world.js';
@@ -21,9 +21,9 @@ const PIXEL_BUDGET = 2.2e6;
 export class WindFields {
   /**
    * @param {HTMLCanvasElement} canvas
-   * @param {{ onFirstFrame?: () => void, onLost?: () => void }} [opts]
+   * @param {{ onFirstFrame?: () => void, onLost?: () => void, scene?: object }} [opts]
    */
-  constructor(canvas, { onFirstFrame, onLost } = {}) {
+  constructor(canvas, { onFirstFrame, onLost, scene } = {}) {
     this.canvas = canvas;
     this.onFirstFrame = onFirstFrame;
     this.onLost = onLost;
@@ -34,16 +34,22 @@ export class WindFields {
     this.running = false;
     this.disposed = false;
     this.mouse = null;
+    this.resumeAfterContextRestore = false;
 
     // 触屏 / 小屏降一档：像素比、阴影图、抗锯齿采样都减半
     const lite = window.matchMedia('(pointer: coarse)').matches || Math.min(window.innerWidth, window.innerHeight) < 700;
-    this.prCap = Math.min(window.devicePixelRatio || 1, lite ? 2 : 1.5);
+    const quality = scene?.quality ?? {};
+    this.devicePrCap = Math.min(window.devicePixelRatio || 1, lite ? 2 : 1.5);
+    this.prCap = Math.min(this.devicePrCap, quality.pixelRatio ?? Infinity);
     this.prLimit = Infinity;   // 帧率撑不住时，adapt() 往下压
     this.pr = this.prCap;
-    const shadowSize = lite ? 1024 : 2048;
-    this.shadowTexel = SHADOW_SPAN / shadowSize;
+    this.defaultShadowSize = lite ? 1024 : 2048;
+    this.shadowMapSize = quality.shadowMapSize ?? this.defaultShadowSize;
+    this.shadowTexel = SHADOW_SPAN / this.shadowMapSize;
 
-    const r = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+    // Let the browser choose the available adapter. Forcing "high-performance"
+    // can fail in sandboxed/virtualized Chrome where only the default adapter works.
+    const r = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
     r.setPixelRatio(this.pr);
     r.outputColorSpace = THREE.LinearSRGBColorSpace;
     r.setClearColor(0xffffff, 1);
@@ -60,7 +66,7 @@ export class WindFields {
     this.sun = new THREE.DirectionalLight(0xfff2dc, 2.3);
     this.sun.castShadow = true;
     const sc = this.sun.shadow;
-    sc.mapSize.set(shadowSize, shadowSize);
+    sc.mapSize.set(this.shadowMapSize, this.shadowMapSize);
     const half = SHADOW_SPAN / 2;
     Object.assign(sc.camera, { left: -half, right: half, top: half, bottom: -half, near: 1, far: 500 });
     sc.camera.updateProjectionMatrix();
@@ -73,6 +79,7 @@ export class WindFields {
 
     this.holder = new THREE.Group();
     this.airplane = createAirplane({ scale: 6.4 / 2.04 });
+    this.airplane.group.scale.multiplyScalar(scene?.planeScale ?? 1);
     this.airplane.group.rotation.y = Math.PI;
     this.holder.add(this.airplane.group);
     this.scene.add(this.holder);
@@ -97,19 +104,27 @@ export class WindFields {
     };
     this.onContextLost = (e) => {
       e.preventDefault();
+      this.resumeAfterContextRestore = this.running;
       this.stop();
       this.onLost?.();
+    };
+    this.onContextRestored = () => {
+      if (this.disposed) return;
+      this.frames = 0;
+      if (this.resumeAfterContextRestore) this.start();
+      this.resumeAfterContextRestore = false;
     };
     canvas.addEventListener('pointermove', this.onMove);
     canvas.addEventListener('pointerleave', this.onLeave);
     canvas.addEventListener('pointerdown', this.onDown);
     canvas.addEventListener('webglcontextlost', this.onContextLost);
+    canvas.addEventListener('webglcontextrestored', this.onContextRestored);
 
     this.ro = new ResizeObserver(() => this.resize());
     this.ro.observe(canvas);
     this.resize();
     this.loop = () => this.tick();
-    this.applyScene(river);
+    this.applyScene(scene ?? coast);
   }
 
   start() {
@@ -137,6 +152,8 @@ export class WindFields {
       uPaper: { value: new THREE.Color('#ffffff') },
       uGlow: { value: new THREE.Color('#fff1cf') },
       uSat: { value: 1.05 },
+      uBloom: { value: 1 },
+      uWarm: { value: 1 },
     };
     this.compMat = new THREE.ShaderMaterial({ vertexShader: COMPOSITE_VERT, fragmentShader: COMPOSITE_FRAG, uniforms: this.cu, depthTest: false, depthWrite: false });
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.compMat);
@@ -182,14 +199,35 @@ export class WindFields {
       this.world.dispose();
     }
     this.cfg = cfg;
+    this.prCap = Math.min(this.devicePrCap, cfg.quality?.pixelRatio ?? Infinity);
+    this.prLimit = Infinity;
+    const shadowMapSize = cfg.quality?.shadowMapSize ?? this.defaultShadowSize;
+    if (shadowMapSize !== this.shadowMapSize) {
+      this.sun.shadow.map?.dispose();
+      this.sun.shadow.map = null;
+      this.shadowMapSize = shadowMapSize;
+      this.sun.shadow.mapSize.set(shadowMapSize, shadowMapSize);
+      this.shadowTexel = SHADOW_SPAN / shadowMapSize;
+    }
     this.world = new World(cfg, this.baker);
     this.scene.add(this.world.group);
     this.applyFog();
+    this.rig.pitch = THREE.MathUtils.degToRad(cfg.cameraPitch ?? 52);
+    this.rig.setFrame(this.camera.aspect, MARGIN);
+    this.airplane.group.scale.setScalar((6.4 / 2.04) * (cfg.planeScale ?? 1));
     this.hemi.groundColor.set(cfg.hemiGround ?? '#9fbf7a');
+    this.sun.color.set(cfg.sunLight ?? '#fff2dc');
     this.cu.uGlow.value.set(cfg.grade?.glow ?? '#fff1cf');
     this.cu.uSat.value = cfg.grade?.sat ?? 1.05;
+    this.cu.uBloom.value = cfg.grade?.bloom ?? 1;
+    this.cu.uWarm.value = cfg.grade?.warm ?? 1;
+    // 对准群岛入口的小岛群，而非对齐单个岛屿，切换时首屏能同时看到不同大小的岛。
+    if (cfg.id === 'island') this.rig.fz = wrapNear(cfg.focusZ ?? 0, this.rig.fz);
+    if (cfg.id === 'alpine') this.rig.fz = wrapNear(cfg.focusZ ?? 0, this.rig.fz);
+    this.flight.setProfile(cfg.flightProfile);
     this.flight.reset(this.rig.fx, this.rig.fz);
     this.stats = this.world.stats;
+    this.resize();
   }
 
   /** 鼠标在纸面内才接管飞机；返回相机 NDC，否则 null */
@@ -260,6 +298,7 @@ export class WindFields {
     c.removeEventListener('pointerleave', this.onLeave);
     c.removeEventListener('pointerdown', this.onDown);
     c.removeEventListener('webglcontextlost', this.onContextLost);
+    c.removeEventListener('webglcontextrestored', this.onContextRestored);
     this.ro.disconnect();
     this.world.dispose();
     this.baker.dispose();
@@ -272,7 +311,6 @@ export class WindFields {
     this.compMat.dispose();
     this.compScene.traverse((o) => o.geometry?.dispose());
     this.renderer.dispose();
-    this.renderer.forceContextLoss();
   }
 }
 

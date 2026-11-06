@@ -2,6 +2,7 @@
 // 每个顶点带 aTrunk（树干=1）和 aH（在树里的相对高度，做底部暗部用）。
 import * as THREE from 'three';
 import { mergeGeometries, fillAttr, mulberry32 } from './config.js';
+import { palmGeometry } from './props_geo.js';
 
 function vnoise3(x, y, z, seed) {
   const h = (i, j, k) => {
@@ -63,6 +64,7 @@ const SHAPES = {
 };
 
 export function makeTreeGeometry(kind, seed = 1, detail = 1) {
+  if (kind === 'palm') return palmGeometry(seed);
   const sh = SHAPES[kind];
   const rnd = mulberry32(seed * 131 + 7);
   const top = Math.max(...sh.lobes.map((l) => l[1] + l[3]));

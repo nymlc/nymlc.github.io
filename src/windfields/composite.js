@@ -19,6 +19,8 @@ uniform vec2 uRtSize;
 uniform vec3 uPaper;
 uniform vec3 uGlow;
 uniform float uSat;
+uniform float uBloom;
+uniform float uWarm;
 
 float hash21(vec2 p) {
   p = fract(p * vec2(233.34, 851.73));
@@ -62,11 +64,12 @@ void main() {
 
   // 柔光：亮处（云顶、水面碎光）向外晕开一点
   vec3 bl = blur(suv, 3.0) * 0.55 + blur(suv, 5.0) * 0.45;
-  scene += max(bl - 0.7, 0.0) * 0.6;
+  scene += max(bl - 0.7, 0.0) * 0.6 * uBloom;
   // 夏天的空气：整体轻微提亮、暗部带一点青、亮部偏暖
   float lum = dot(scene, vec3(0.299, 0.587, 0.114));
   scene = mix(vec3(lum), scene, uSat);
-  scene = mix(scene * vec3(0.96, 1.0, 1.04), scene * vec3(1.04, 1.01, 0.96), smoothstep(0.2, 0.8, lum));
+  vec3 seasonalTone = mix(scene * vec3(0.96, 1.0, 1.04), scene * vec3(1.04, 1.01, 0.96), smoothstep(0.2, 0.8, lum));
+  scene = mix(scene, seasonalTone, uWarm);
   scene += vec3(0.012, 0.02, 0.026) * (1.0 - lum);
   // 左上角的阳光
   float asp = uRtHalf.x / uRtHalf.y;

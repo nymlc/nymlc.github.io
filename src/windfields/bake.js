@@ -81,6 +81,7 @@ export class TerrainBaker {
         uLayout: { value: this.blank },
         uLayoutSize: { value: new THREE.Vector2(lw, lh) },
         uOverlay: { value: this.blank },
+        uSunTint: { value: new THREE.Color(cfg.sunTint ?? '#ffffff') },
       },
       blending: THREE.NoBlending,
       depthTest: false,

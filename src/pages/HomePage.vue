@@ -1,15 +1,12 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import '../styles/home.css';
+import { alpine, coast, island, river } from '../windfields/scenes.js';
 
-const scene = {
-  name: '草原河流',
-  note: '草原河流 · 顺水而行',
-  line: '水声不急，草坡顺着河湾慢慢铺开。',
-  src: '/assets/scenes/scene-grassland-river.webp',
-  srcSm: '/assets/scenes/scene-grassland-river-sm.webp',
-  alt: '俯瞰草原河流：蜿蜒的河湾、乡间土路、树林与牧场',
-};
+const sceneOptions = [river, coast, alpine, island];
+const sceneById = Object.fromEntries(sceneOptions.map((item) => [item.id, item]));
+const selectedSceneId = ref('coast');
+const activeScene = computed(() => sceneById[selectedSceneId.value]);
 
 const hero = ref(null);
 const poster = ref(null);
@@ -23,6 +20,12 @@ let app = null;
 let building = false;
 let unmounted = false;
 let cancelIdle = () => {};
+
+function chooseScene(id) {
+  if (!sceneById[id] || selectedSceneId.value === id) return;
+  selectedSceneId.value = id;
+  app?.applyScene(activeScene.value);
+}
 
 // 实时场景在海报图出来、浏览器空下来之后才加载；海报先顶着，第一帧出来后画布淡入。
 // 不等 window.load：字体样式表会把 load 拖得很晚
@@ -52,6 +55,7 @@ async function build() {
     const { createWindFields } = await import('../windfields/index.js');
     if (unmounted) return;
     app = createWindFields(canvas.value, {
+      scene: activeScene.value,
       onFirstFrame: () => { live.value = true; },
       onLost: () => { live.value = false; },
     });
@@ -114,12 +118,12 @@ onBeforeUnmount(() => {
           <img
             ref="poster"
             class="scene-poster"
-            :src="scene.src"
-            :srcset="`${scene.srcSm} 1000w, ${scene.src} 2000w`"
+            :src="activeScene.src"
+            :srcset="`${activeScene.srcSm} 1000w, ${activeScene.src} 2000w`"
             sizes="(max-width: 680px) calc(100vw - 24px), (max-width: 900px) calc(100vw - 48px), (max-width: 1800px) 92vw, 1600px"
             width="2000"
-            height="1036"
-            :alt="scene.alt"
+            height="769"
+            :alt="activeScene.alt"
             loading="eager"
             fetchpriority="high"
             decoding="async"
@@ -130,10 +134,19 @@ onBeforeUnmount(() => {
         <div class="scene-caption">
           <div class="scene-caption-copy">
             <h1>nymlc Projects</h1>
-            <p class="scene-sub">把日常的小麻烦，做成顺手的独立应用。<span class="scene-sub-detail">{{ scene.line }}</span></p>
+            <p class="scene-sub">把日常的小麻烦，做成顺手的独立应用。<span class="scene-sub-detail">{{ activeScene.line }}</span></p>
           </div>
           <div class="scene-caption-meta">
-            <p class="scene-note">{{ scene.note }}</p>
+            <div class="scene-switch" role="group" aria-label="场景主题">
+              <button
+                v-for="item in sceneOptions"
+                :key="item.id"
+                type="button"
+                :aria-pressed="selectedSceneId === item.id"
+                @click="chooseScene(item.id)"
+              >{{ item.name }}</button>
+            </div>
+            <p class="scene-note">{{ activeScene.note }}</p>
             <a class="scene-cue" href="#projects">看看我做的应用 <span aria-hidden="true">↓</span></a>
           </div>
         </div>
@@ -173,14 +186,14 @@ onBeforeUnmount(() => {
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 20v-8m0 3c-4.8 0-7-2.8-7-7 4.2 0 7 2.2 7 7Zm0-3c0-4.4 2.4-7 7-7 0 4.2-2.4 7-7 7Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <span>下一个应用，还在田里慢慢长</span>
+          <span>下一个应用，还在慢慢生长</span>
         </div>
       </section>
 
       <footer id="about" class="home-foot">
         <span>nymlc Projects · 独立应用与工具 · {{ new Date().getFullYear() }}</span>
         <span class="home-foot-credit">
-          田野场景基于
+          实时场景基于
           <a href="https://github.com/cswfww123/wind-fields" target="_blank" rel="noreferrer">wind-fields</a>
           渲染 ·
           <a href="https://github.com/nymlc" target="_blank" rel="noreferrer">GitHub ↗</a>

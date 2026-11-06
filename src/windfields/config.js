@@ -4,7 +4,7 @@ import * as THREE from 'three';
 export const LOOP = 256;        // z 方向循环周期（世界单位），地形首尾无缝
 export const WORLD_W = 224;     // 地形宽度，x ∈ [-112, 112]（宽幅画面拉远后看得到更宽的地面）
 export const H_MIN = -8;        // 高度编码范围（16 bit）
-export const H_MAX = 40;
+export const H_MAX = 64;
 
 // 太阳在画面左侧、略偏镜头这边（西偏南），仰角约 57°：
 // 影子落向右上，飞机的影子正好落在它右前方看得见的地方；朝镜头的这一面是亮的，画面高调

@@ -83,11 +83,12 @@ export const VARIANTS = [
   { shape: 'conifer', seed: 5, detail: 1 },
   { shape: 'umbrella', seed: 9, detail: 1 },
   { shape: 'bush', seed: 4, detail: 1 },
+  { shape: 'palm', seed: 12, detail: 1 },
 ];
 
 export class Forest {
   /** trees: [{ x, y, z, s, sy, rot, v (variant), pal, b, hue, ph }] */
-  constructor(trees, palettes) {
+  constructor(trees, palettes, castShadows = true) {
     this.group = new THREE.Group();
     this.geos = VARIANTS.map((v) => makeTreeGeometry(v.shape, v.seed, v.detail));
     this.mat = new THREE.ShaderMaterial({
@@ -122,7 +123,7 @@ export class Forest {
         mesh.geometry = this.geos[v].clone();
         mesh.geometry.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seeds, 4));
         mesh.instanceMatrix.needsUpdate = true;
-        mesh.castShadow = true;
+        mesh.castShadow = castShadows;
         mesh.receiveShadow = true;
         mesh.computeBoundingSphere();
         node.add(mesh);

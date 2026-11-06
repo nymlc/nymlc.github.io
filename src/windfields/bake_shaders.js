@@ -19,6 +19,7 @@ ${GLSL_CONST}
 uniform vec2 uSize;
 uniform int uPass;
 uniform sampler2D uOverlay;
+uniform vec3 uSunTint;
 ${NOISE}
 ${CURVES_GLSL}
 ${LAYOUT_GLSL}
@@ -51,7 +52,7 @@ void main() {
   float ao = g.ao * (1.0 - cav) * (0.92 + 0.08 * n.y);
   // 包裹光：背光坡不至于发黑；再加一点同色地面的反光（画面里阴影是暖的）
   float ndl = max(dot(n, SUN_DIR) + 0.35, 0.0) / (SUN_DIR.y + 0.35);
-  vec3 lit = alb * (SKY_COL * ao + SUN_COL * ndl + alb * 0.22 * (1.0 - n.y)) * 0.9;
+  vec3 lit = alb * (SKY_COL * ao + SUN_COL * uSunTint * ndl + alb * 0.22 * (1.0 - n.y)) * 0.9;
   lit = lit / (1.0 + 0.18 * max(lit - 0.85, 0.0));
   gl_FragColor = vec4(lit, g.flower * keep * (1.0 - g.water));
 }

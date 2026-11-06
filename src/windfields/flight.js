@@ -4,7 +4,8 @@ import * as THREE from 'three';
 import { WORLD_W } from './config.js';
 
 // 飞机飞在云顶之上，不跟云做碰撞交互
-const PLANE_Y = 46;
+const DEFAULT_PLANE_Y = 46;
+const DEFAULT_PLANE_LEAD = 30;
 
 const clamp = THREE.MathUtils.clamp;
 const wrapA = (a) => Math.atan2(Math.sin(a), Math.cos(a));
@@ -71,15 +72,23 @@ export class Rig {
 export class Flight {
   constructor() {
     this.ray = new THREE.Raycaster();
-    this.alt = new THREE.Plane(new THREE.Vector3(0, 1, 0), -PLANE_Y);
+    this.altitude = DEFAULT_PLANE_Y;
+    this.lead = DEFAULT_PLANE_LEAD;
+    this.alt = new THREE.Plane(new THREE.Vector3(0, 1, 0), -this.altitude);
     this.hit = new THREE.Vector3();
     this.reset(0, 0);
   }
 
+  setProfile({ altitude = DEFAULT_PLANE_Y, lead = DEFAULT_PLANE_LEAD } = {}) {
+    this.altitude = altitude;
+    this.lead = lead;
+    this.alt.constant = -altitude;
+  }
+
   reset(fx, fz) {
     this.x = fx;
-    this.z = fz + 30;
-    this.y = PLANE_Y;
+    this.z = fz + this.lead;
+    this.y = this.altitude;
     this.heading = 0;
     this.speed = 4;
     this.bank = 0;
@@ -99,7 +108,7 @@ export class Flight {
     this.t += dt;
     const k = rig.zoom;
     let tx = rig.fx + k * (13 * Math.sin(this.t * 0.043) + 5 * Math.sin(this.t * 0.107 + 1.3));
-    let tz = rig.fz + 30 + 5 * k * Math.sin(this.t * 0.067 + 0.5);
+    let tz = rig.fz + this.lead + 5 * k * Math.sin(this.t * 0.067 + 0.5);
     let gain = 0.22;
     if (mouseNdc) {
       this.ray.setFromCamera(mouseNdc, camera);

@@ -18,21 +18,44 @@ export function placeHouses(f, cfg, rnd) {
   const out = [];
   if (!H) return out;
   const cell = H.cell ?? 8;
+  const jitter = cfg.architecture === 'jiangnan' ? 0.86 : 0.6;
+  const jiangnanBuckets = cfg.architecture === 'jiangnan' ? new Map() : null;
+  const bucketSize = 8;
+  const bucketCountZ = LOOP / bucketSize;
+  const bucketKey = (x, z) => `${Math.floor((x + WORLD_W / 2) / bucketSize)},${Math.floor((z + LOOP / 2) / bucketSize)}`;
   for (let z = -LOOP / 2; z < LOOP / 2; z += cell) {
     for (let x = -WORLD_W / 2 + 8; x < WORLD_W / 2 - 8; x += cell) {
-      const px = x + (rnd() - 0.5) * cell * 0.6;
-      const pz = wrapNear(z + (rnd() - 0.5) * cell * 0.6, 0);
+      const px = x + (rnd() - 0.5) * cell * jitter;
+      const pz = wrapNear(z + (rnd() - 0.5) * cell * jitter, 0);
       if (rnd() > f.village(px, pz) * 1.5) continue;
-      const w = 3.0 + rnd() * 2.0;
-      const d = 2.3 + rnd() * 1.2;
-      const r = Math.max(w, d) * 0.6 + 1.2;
+      const w = H.size ? H.size[0] + rnd() * (H.size[1] - H.size[0]) : 3.0 + rnd() * 2.0;
+      const d = H.size ? H.size[2] + rnd() * (H.size[3] - H.size[2]) : 2.3 + rnd() * 1.2;
+      const r = cfg.architecture === 'jiangnan'
+        ? Math.hypot(w, d) * 0.36 + 0.1
+        : Math.max(w, d) * 0.6 + 1.2;
       let okk = f.slope(px, pz) < 0.32;
       for (let a = 0; a < 6 && okk; a++) {
         const ax = px + Math.cos(a) * r, az = pz + Math.sin(a) * r;
         const ac = f.cls(ax, az);
         okk = freeLand(f, ax, az) && ac !== CL.FIELD && ac !== CL.ORCHARD;
       }
-      if (!okk || out.some((o) => Math.hypot(o.x - px, wrapNear(o.z, pz) - pz) < r + o.r + 1.5)) continue;
+      if (!okk) continue;
+      let blocked;
+      if (jiangnanBuckets) {
+        blocked = false;
+        const bx = Math.floor((px + WORLD_W / 2) / bucketSize);
+        const bz = Math.floor((pz + LOOP / 2) / bucketSize);
+        for (let dz = -1; dz <= 1 && !blocked; dz++) {
+          const nz = (bz + dz + bucketCountZ) % bucketCountZ;
+          for (let dx = -1; dx <= 1 && !blocked; dx++) {
+            const bucket = jiangnanBuckets.get(`${bx + dx},${nz}`);
+            if (bucket?.some((o) => Math.hypot(o.x - px, wrapNear(o.z, pz) - pz) < r + o.r + (H.spacing ?? 1.5))) blocked = true;
+          }
+        }
+      } else {
+        blocked = out.some((o) => Math.hypot(o.x - px, wrapNear(o.z, pz) - pz) < r + o.r + (H.spacing ?? 1.5));
+      }
+      if (blocked) continue;
       // 屋脊顺着最近的路
       let rot = rnd() * Math.PI;
       let best = Infinity;
@@ -49,13 +72,20 @@ export function placeHouses(f, cfg, rnd) {
       for (const [sx, sz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
         y = Math.min(y, f.height(px + sx * w * 0.5, pz + sz * d * 0.5));
       }
-      out.push({
+      const house = {
         x: px, z: pz, y: y - 0.1, w, d, r, rot,
         h: 1.7 + rnd() * 0.7,
         wall: H.walls[(rnd() * H.walls.length) | 0],
         roof: H.roofs[(rnd() * H.roofs.length) | 0],
         garden: rnd() < 0.55,
-      });
+      };
+      out.push(house);
+      if (jiangnanBuckets) {
+        const key = bucketKey(px, pz);
+        const bucket = jiangnanBuckets.get(key) ?? [];
+        bucket.push(house);
+        jiangnanBuckets.set(key, bucket);
+      }
     }
   }
   return out;
@@ -139,13 +169,43 @@ export function placeAnimals(f, cfg, rnd) {
 export function placeBoats(f, cfg, rnd) {
   const out = [];
   if (!cfg.boats) return out;
+  const checkRadius = cfg.boatCheckRadius ?? 6;
+  const boatSpeed = cfg.boatSpeed;
+  if (cfg.boatSpots?.length) {
+    for (const [x, z, heading] of cfg.boatSpots) {
+      const fits = (px, pz) => {
+        for (let a = 0; a < 8; a++) {
+          if (f.water(px + Math.cos(a * Math.PI / 4) * checkRadius, pz + Math.sin(a * Math.PI / 4) * checkRadius) <= 0.95) return false;
+        }
+        return true;
+      };
+      let px = x, pz = z;
+      let wet = fits(px, pz);
+      // 水道受程序化弯曲与轻微扭曲影响，在预设点附近吸附到完整水面，
+      // 避免乌篷船被校验过滤掉或压在浅滩上。
+      const search = cfg.boatSearchRadius ?? 0;
+      for (let r = 0.5; !wet && r <= search; r += 0.5) {
+        for (let a = 0; a < 24 && !wet; a++) {
+          const angle = a * Math.PI / 12;
+          const sx = x + Math.cos(angle) * r, sz = z + Math.sin(angle) * r;
+          if (fits(sx, sz)) { px = sx; pz = sz; wet = true; }
+        }
+      }
+      if (wet) out.push({
+        x: px, z: pz,
+        rot: Number.isFinite(heading) ? heading : rnd() * Math.PI * 2,
+        speed: boatSpeed ?? (0.3 + rnd() * 0.3),
+      });
+    }
+    return out;
+  }
   let tries = 0;
   while (out.length < cfg.boats && tries++ < 600) {
     const x = (rnd() - 0.5) * (WORLD_W - 50);
     const z = (rnd() - 0.5) * LOOP;
     let wet = true;
-    for (let a = 0; a < 8 && wet; a++) wet = f.water(x + Math.cos(a) * 6, z + Math.sin(a) * 6) > 0.95;
-    if (wet) out.push({ x, z, rot: rnd() * Math.PI * 2, speed: 0.5 + rnd() * 0.6 });
+    for (let a = 0; a < 8 && wet; a++) wet = f.water(x + Math.cos(a) * checkRadius, z + Math.sin(a) * checkRadius) > 0.95;
+    if (wet) out.push({ x, z, rot: rnd() * Math.PI * 2, speed: boatSpeed ?? (0.5 + rnd() * 0.6) });
   }
   return out;
 }
