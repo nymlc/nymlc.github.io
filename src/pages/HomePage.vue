@@ -3,9 +3,9 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import '../styles/home.css';
 import { alpine, coast, island, river } from '../windfields/scenes.js';
 
-const sceneOptions = [river, coast, alpine, island];
+const sceneOptions = [island, river, coast, alpine];
 const sceneById = Object.fromEntries(sceneOptions.map((item) => [item.id, item]));
-const selectedSceneId = ref('coast');
+const selectedSceneId = ref('island');
 const activeScene = computed(() => sceneById[selectedSceneId.value]);
 
 const hero = ref(null);
@@ -109,7 +109,7 @@ onBeforeUnmount(() => {
         <span class="brand-mark" aria-hidden="true">n.</span>
         <span class="brand-copy"><strong>nymlc</strong><small>PROJECTS</small></span>
       </a>
-      <a class="home-bar-link" href="#finderx">认识 FinderX <span aria-hidden="true">↗</span></a>
+      <a class="home-bar-link" href="#projects">浏览作品 <span aria-hidden="true">↓</span></a>
     </header>
 
     <main>
@@ -137,6 +137,7 @@ onBeforeUnmount(() => {
             <p class="scene-sub">把日常的小麻烦，做成顺手的独立应用。<span class="scene-sub-detail">{{ activeScene.line }}</span></p>
           </div>
           <div class="scene-caption-meta">
+            <span class="scene-switch-label">风景</span>
             <div class="scene-switch" role="group" aria-label="场景主题">
               <button
                 v-for="item in sceneOptions"
@@ -146,8 +147,6 @@ onBeforeUnmount(() => {
                 @click="chooseScene(item.id)"
               >{{ item.name }}</button>
             </div>
-            <p class="scene-note">{{ activeScene.note }}</p>
-            <a class="scene-cue" href="#projects">看看我做的应用 <span aria-hidden="true">↓</span></a>
           </div>
         </div>
       </section>

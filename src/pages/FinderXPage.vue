@@ -6,7 +6,7 @@ const features = [
   {
     number: '01 / FINDERX',
     icon: '⌂',
-    tone: 'purple',
+    tone: 'green',
     title: '常用位置与最近记录',
     description: '从贴边工具栏或菜单栏入口，访问收藏、最近打开的文件夹与文件。历史列表和当前已打开位置分开呈现。',
     tags: ['收藏', '最近文件夹', '最近文件'],
@@ -14,7 +14,7 @@ const features = [
   {
     number: '02 / NAVIGATION',
     icon: '↔',
-    tone: 'blue',
+    tone: 'green',
     title: 'Finder 导航',
     description: '在图标视图的行首、行尾继续使用方向键；支持跨行与 Shift 扩选，不可靠时交还 Finder 原生处理。',
     tags: ['方向键', '跨行移动', 'Shift 扩选'],
@@ -30,7 +30,7 @@ const features = [
   {
     number: '04 / AI NAMING',
     icon: '✳',
-    tone: 'orange',
+    tone: 'green',
     title: 'AI 文件命名',
     description: '在重命名或另存为时生成候选名称。你可以配置兼容服务、选择模型，并在发送前查看本次请求内容。',
     tags: ['你来配置', '发送前预览', '钥匙串保护'],
@@ -46,7 +46,6 @@ const releaseUrl = 'https://github.com/nymlc/nymlc.github.io/releases';
     <main>
       <section class="product-hero">
         <div class="product-copy" v-reveal>
-          <a class="back-link" href="/">← <span>nymlc Projects</span></a>
           <p class="product-kicker"><i></i> A BETTER FLOW FOR FINDER</p>
           <h1>文件切换，<br><em>不必绕远路。</em></h1>
           <p class="product-intro">常用位置、最近记录与快捷操作，就在 Finder 旁边。少一点窗口间的来回，多一点顺手。</p>
@@ -57,9 +56,16 @@ const releaseUrl = 'https://github.com/nymlc/nymlc.github.io/releases';
           <div class="product-platform"><span>macOS 11+</span><i></i><span>Apple Silicon</span><i></i><span>原生 macOS 应用</span></div>
         </div>
         <div class="product-visual" v-reveal="100">
-          <div class="screenshot-glow"></div>
           <figure class="product-screenshot">
-            <img src="/assets/finderx-real-history-settings.png" width="666" height="606" alt="FinderX 真实设置窗口，展示最近文件夹和最近文件数量配置">
+            <div class="screenshot-stage">
+              <img
+                src="/assets/finderx-real-history-settings.png"
+                srcset="/assets/finderx-real-history-settings.png 1x, /assets/finderx-real-history-settings@2x.png 2x"
+                width="620"
+                height="560"
+                alt="FinderX 完整设置窗口，展示侧边栏、功能入口和历史记录设置"
+              >
+            </div>
             <figcaption><span>真实应用截图</span><span>FINDERX / 历史记录</span></figcaption>
           </figure>
         </div>
@@ -77,7 +83,6 @@ const releaseUrl = 'https://github.com/nymlc/nymlc.github.io/releases';
             <h3>{{ feature.title }}</h3>
             <p>{{ feature.description }}</p>
             <div class="tag-list"><span v-for="tag in feature.tags" :key="tag">{{ tag }}</span></div>
-            <span class="feature-watermark" aria-hidden="true">{{ feature.number.slice(0, 2) }}</span>
           </article>
         </div>
       </section>
