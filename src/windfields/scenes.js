@@ -121,8 +121,10 @@ export const alpine = {
   focusZ: -70,
   cameraPitch: 28,
   terrainBounds: { depth: 288, centerZ: 26 },
-  flightProfile: { altitude: 58, lead: 108 },
-  quality: { pixelRatio: 1.2, shadowMapSize: 1024, treeShadows: false },
+  // 飞机贴着山谷与山脊的起伏飞（最低 24，离脚下最高处至少 14）：和其他主题一样看得见机身旁的影子，
+  // 机身大小也和它们相当；原先整体飞到 58 高，离镜头近了一圈，影子又落出了阴影相机和画面之外。
+  flightProfile: { altitude: 24, lead: 48, clearance: 14 },
+  quality: { pixelRatio: 1.2, shadowMapSize: 1024 },
   biome: alpineGLSL,
   curves: alpineCurves,
   flowers: ['#f1f0e5', '#ded7a3', '#d69ca2', '#b7acd0', '#d99b70', '#9fc7d4'],

@@ -6,7 +6,7 @@ nymlc 的统一项目介绍与下载入口。网站使用 Vue 3、Vite 和 Three
 
 - `/`：应用总览，首屏提供实时渲染的宽幅自然场景（WebGL），下方是项目介绍
 - `/projects/finderx/`：FinderX 项目介绍
-- `/projects/finderx/download.html`：正式版下载、系统要求和安装说明
+- `/projects/finderx/#download`：FinderX 下载、系统要求和安装说明
 - `/projects/finderx/privacy.html`：权限与数据说明
 
 ## 首页实时场景

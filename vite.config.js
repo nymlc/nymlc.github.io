@@ -11,7 +11,6 @@ export default defineConfig({
       input: {
         home: 'index.html',
         finderx: 'projects/finderx/index.html',
-        download: 'projects/finderx/download.html',
         privacy: 'projects/finderx/privacy.html',
       },
     },

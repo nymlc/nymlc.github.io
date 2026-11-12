@@ -225,6 +225,7 @@ export class WindFields {
     if (cfg.id === 'island') this.rig.fz = wrapNear(cfg.focusZ ?? 0, this.rig.fz);
     if (cfg.id === 'alpine') this.rig.fz = wrapNear(cfg.focusZ ?? 0, this.rig.fz);
     this.flight.setProfile(cfg.flightProfile);
+    this.flight.setGround((x, z) => this.world.field.height(x, z));
     this.flight.reset(this.rig.fx, this.rig.fz);
     this.stats = this.world.stats;
     this.resize();

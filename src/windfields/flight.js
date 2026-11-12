@@ -6,6 +6,8 @@ import { WORLD_W } from './config.js';
 // 飞机飞在云顶之上，不跟云做碰撞交互
 const DEFAULT_PLANE_Y = 46;
 const DEFAULT_PLANE_LEAD = 30;
+// 贴地形飞行时，爬升引起的画面上移被抵消多少（0~1）；留一部分，机身才会停在画面上半部，影子也不掉出画面
+const CLIMB_COMP = 0.4;
 
 const clamp = THREE.MathUtils.clamp;
 const wrapA = (a) => Math.atan2(Math.sin(a), Math.cos(a));
@@ -74,15 +76,27 @@ export class Flight {
     this.ray = new THREE.Raycaster();
     this.altitude = DEFAULT_PLANE_Y;
     this.lead = DEFAULT_PLANE_LEAD;
+    this.clearance = 0;
+    this.ground = null;
     this.alt = new THREE.Plane(new THREE.Vector3(0, 1, 0), -this.altitude);
     this.hit = new THREE.Vector3();
     this.reset(0, 0);
   }
 
-  setProfile({ altitude = DEFAULT_PLANE_Y, lead = DEFAULT_PLANE_LEAD } = {}) {
+  /**
+   * altitude 是最低飞行高度；clearance > 0 时飞机贴着地形起伏飞（离最高处至少 clearance），
+   * 这样高山场景里飞机不用整体飞得很高，影子也始终落在机身旁边、留在画面里。
+   */
+  setProfile({ altitude = DEFAULT_PLANE_Y, lead = DEFAULT_PLANE_LEAD, clearance = 0 } = {}) {
     this.altitude = altitude;
     this.lead = lead;
+    this.clearance = clearance;
     this.alt.constant = -altitude;
+  }
+
+  /** 地形高度采样函数 (x, z) => 高度；不传则始终保持固定高度 */
+  setGround(fn) {
+    this.ground = fn ?? null;
   }
 
   reset(fx, fz) {
@@ -109,8 +123,12 @@ export class Flight {
     const k = rig.zoom;
     let tx = rig.fx + k * (13 * Math.sin(this.t * 0.043) + 5 * Math.sin(this.t * 0.107 + 1.3));
     let tz = rig.fz + this.lead + 5 * k * Math.sin(this.t * 0.067 + 0.5);
+    // 斜视镜头里，飞得越高在画面里越靠上；爬升时把落点往镜头方向让一点，抵消一部分上移，
+    // 但不全抵消：机身要留在画面上半部分，影子（在机身下方）才不会掉出画面
+    if (this.clearance > 0) tz += ((this.y - this.altitude) / Math.tan(rig.pitch)) * CLIMB_COMP;
     let gain = 0.22;
     if (mouseNdc) {
+      this.alt.constant = -this.y;   // 按飞机当前高度求落点：贴地形爬升后，机身才会停在鼠标指的位置
       this.ray.setFromCamera(mouseNdc, camera);
       if (this.ray.ray.intersectPlane(this.alt, this.hit)) {
         tx = this.hit.x;
@@ -130,6 +148,7 @@ export class Flight {
     this.x += Math.sin(this.heading) * this.speed * dt;
     this.z -= Math.cos(this.heading) * this.speed * dt;
     this.x = clamp(this.x, rig.fx - 40 * k, rig.fx + 40 * k);
+    this.followTerrain(dt);
     const bankT = clamp((-turn / Math.max(dt, 1e-4)) * 0.9, -0.55, 0.55);
     this.bank += (bankT - this.bank) * (1 - Math.exp(-dt * 1.8));
 
@@ -165,5 +184,20 @@ export class Flight {
 
   shift(dz) {
     this.z += dz;
+  }
+
+  /** 取机头前方与两翼下的一小片地面的最高点，慢慢爬升 / 下降到它之上 clearance 处 */
+  followTerrain(dt) {
+    if (!this.ground || this.clearance <= 0) return;
+    const fx = Math.sin(this.heading), fz = -Math.cos(this.heading);
+    const rx = Math.cos(this.heading), rz = Math.sin(this.heading);
+    let top = -Infinity;
+    for (const d of [-4, 6, 16, 26]) {
+      for (const s of [-6, 0, 6]) {
+        top = Math.max(top, this.ground(this.x + fx * d + rx * s, this.z + fz * d + rz * s));
+      }
+    }
+    const target = Math.max(this.altitude, top + this.clearance);
+    this.y += (target - this.y) * (1 - Math.exp(-dt * (target > this.y ? 1.6 : 0.9)));
   }
 }

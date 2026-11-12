@@ -5,6 +5,7 @@ defineProps({
 </script>
 
 <template>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="nymlc Projects 首页">
       <span class="brand-mark" aria-hidden="true">n.</span>
@@ -22,7 +23,7 @@ defineProps({
       >GitHub <span aria-hidden="true">↗</span></a>
       <a
         class="nav-download"
-        href="/projects/finderx/download.html"
+        href="/projects/finderx/#download"
       >获取 FinderX <span aria-hidden="true">→</span></a>
     </nav>
   </header>

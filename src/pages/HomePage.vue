@@ -14,8 +14,21 @@ const canvas = ref(null);
 const live = ref(false);
 const offscreen = ref(false);
 const ready = ref(false);
+const reducedMotion = ref(false);
+const saveData = ref(false);
+const manualPaused = ref(false);
+const posterFailed = ref(false);
+const webglFailed = ref(false);
+const fallbackLabel = computed(() => {
+  if (webglFailed.value) return '当前使用静态预览';
+  if (reducedMotion.value) return '已尊重减少动态效果设置';
+  if (saveData.value) return '已尊重省流量设置';
+  if (posterFailed.value && !live.value) return '场景预览图片暂不可用';
+  return '';
+});
 
 let observer;
+let motionQuery;
 let app = null;
 let building = false;
 let unmounted = false;
@@ -24,7 +37,9 @@ let cancelIdle = () => {};
 function chooseScene(id) {
   if (!sceneById[id] || selectedSceneId.value === id) return;
   selectedSceneId.value = id;
+  posterFailed.value = false;
   app?.applyScene(activeScene.value);
+  if (offscreen.value || manualPaused.value || reducedMotion.value || saveData.value) live.value = false;
 }
 
 // 实时场景在海报图出来、浏览器空下来之后才加载；海报先顶着，第一帧出来后画布淡入。
@@ -49,36 +64,61 @@ function whenIdle(fn) {
 }
 
 async function build() {
-  if (building || app || unmounted || !canvas.value) return;
+  if (building || app || unmounted || !canvas.value || reducedMotion.value || saveData.value || manualPaused.value) return;
   building = true;
   try {
     const { createWindFields } = await import('../windfields/index.js');
     if (unmounted) return;
     app = createWindFields(canvas.value, {
       scene: activeScene.value,
-      onFirstFrame: () => { live.value = true; },
-      onLost: () => { live.value = false; },
+      onFirstFrame: () => {
+        webglFailed.value = false;
+        live.value = true;
+      },
+      onLost: () => {
+        webglFailed.value = true;
+        live.value = false;
+      },
     });
-    if (!offscreen.value) app.start();
+    if (!offscreen.value && !reducedMotion.value && !saveData.value && !manualPaused.value) app.start();
   } catch (error) {
     console.warn('[nymlc] 实时场景不可用，继续显示海报图', error);
     app = null;
+    webglFailed.value = true;
   } finally {
     building = false;
   }
 }
 
 // 进入视口才建 / 才跑，离开就暂停
-watch([ready, offscreen], () => {
+watch([ready, offscreen, reducedMotion, saveData, manualPaused], () => {
   if (!ready.value) return;
-  if (offscreen.value) app?.stop();
-  else if (app) app.start();
+  if (offscreen.value || reducedMotion.value || saveData.value || manualPaused.value) app?.stop();
+  else if (app) {
+    app.start();
+    live.value = true;
+  }
   else build();
 });
+
+function onMotionPreferenceChange(event) {
+  reducedMotion.value = event.matches;
+  if (event.matches) {
+    app?.stop();
+    live.value = false;
+  } else if (!saveData.value) {
+    whenIdle(() => { ready.value = true; });
+  }
+}
 
 onMounted(() => {
   document.title = 'nymlc Projects — 小工具，认真做';
   document.body.classList.add('is-home');
+  motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  reducedMotion.value = motionQuery.matches;
+  saveData.value = navigator.connection?.saveData === true;
+  if ('addEventListener' in motionQuery) motionQuery.addEventListener('change', onMotionPreferenceChange);
+  else motionQuery.addListener?.(onMotionPreferenceChange);
 
   if ('IntersectionObserver' in window) {
     observer = new IntersectionObserver(([entry]) => {
@@ -87,9 +127,7 @@ onMounted(() => {
     observer.observe(hero.value);
   }
 
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const saveData = navigator.connection?.saveData === true;
-  if (!reduced && !saveData) whenIdle(() => { ready.value = true; });
+  if (!reducedMotion.value && !saveData.value) whenIdle(() => { ready.value = true; });
 });
 
 onBeforeUnmount(() => {
@@ -97,6 +135,8 @@ onBeforeUnmount(() => {
   cancelIdle();
   document.body.classList.remove('is-home');
   observer?.disconnect();
+  if (motionQuery && 'removeEventListener' in motionQuery) motionQuery.removeEventListener('change', onMotionPreferenceChange);
+  else motionQuery?.removeListener?.(onMotionPreferenceChange);
   app?.dispose();
   app = null;
 });
@@ -104,20 +144,25 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="site-home">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
     <header class="home-bar">
       <a class="brand" href="/" aria-label="nymlc Projects 首页">
         <span class="brand-mark" aria-hidden="true">n.</span>
         <span class="brand-copy"><strong>nymlc</strong><small>PROJECTS</small></span>
       </a>
-      <a class="home-bar-link" href="#projects">浏览作品 <span aria-hidden="true">↓</span></a>
+      <nav aria-label="页面导航">
+        <a class="home-bar-link" href="#projects">浏览作品 <span aria-hidden="true">↓</span></a>
+      </nav>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1">
       <section ref="hero" class="scene-hero" aria-label="nymlc Projects">
         <div class="scene-stage" :class="{ 'is-live': live }">
           <img
             ref="poster"
             class="scene-poster"
+            :class="{ 'is-failed': posterFailed }"
+            :key="activeScene.id"
             :src="activeScene.src"
             :srcset="`${activeScene.srcSm} 1000w, ${activeScene.src} 2000w`"
             sizes="(max-width: 680px) calc(100vw - 24px), (max-width: 900px) calc(100vw - 48px), (max-width: 1800px) 92vw, 1600px"
@@ -127,6 +172,7 @@ onBeforeUnmount(() => {
             loading="eager"
             fetchpriority="high"
             decoding="async"
+            @error="posterFailed = true"
           >
           <canvas ref="canvas" class="scene-canvas" aria-hidden="true"></canvas>
         </div>
@@ -134,7 +180,11 @@ onBeforeUnmount(() => {
         <div class="scene-caption">
           <div class="scene-caption-copy">
             <h1>nymlc Projects</h1>
-            <p class="scene-sub">把日常的小麻烦，做成顺手的独立应用。<span class="scene-sub-detail">{{ activeScene.line }}</span></p>
+            <p class="scene-sub">
+              把日常的小麻烦，做成顺手的独立应用。
+              <span class="scene-sub-detail">{{ activeScene.line }}</span>
+              <span v-if="fallbackLabel" class="scene-status">{{ fallbackLabel }}</span>
+            </p>
           </div>
           <div class="scene-caption-meta">
             <span class="scene-switch-label">风景</span>
@@ -147,8 +197,18 @@ onBeforeUnmount(() => {
                 @click="chooseScene(item.id)"
               >{{ item.name }}</button>
             </div>
+            <button
+              class="scene-motion-toggle"
+              type="button"
+              :aria-pressed="manualPaused"
+              :aria-label="manualPaused ? '恢复场景动画' : '暂停场景动画'"
+              @click="manualPaused = !manualPaused"
+            >{{ manualPaused ? '播放动画' : '暂停动画' }}</button>
           </div>
         </div>
+        <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {{ manualPaused ? `${activeScene.name}：场景动画已暂停` : (fallbackLabel ? `${activeScene.name}：${fallbackLabel}` : `${activeScene.name}场景正在播放`) }}
+        </p>
       </section>
 
       <section id="projects" class="projects">
@@ -169,7 +229,7 @@ onBeforeUnmount(() => {
             </a>
             <p class="app-desc">把最近记录、Finder 导航、AI 命名和局域网扫码传输，放到你已经习惯的 Finder 旁边。少一点来回切换，多一点顺手。</p>
             <div class="app-actions">
-              <a class="app-download" href="/projects/finderx/download.html"><span aria-hidden="true">↓</span> 下载 FinderX · macOS</a>
+              <a class="app-download" href="/projects/finderx/#download"><span aria-hidden="true">↓</span> 获取 FinderX · macOS</a>
               <a class="app-more" href="/projects/finderx/">了解更多 <span aria-hidden="true">→</span></a>
             </div>
           </div>

@@ -2,14 +2,11 @@ import { createApp } from 'vue';
 import './styles/main.css';
 import HomePage from './pages/HomePage.vue';
 import FinderXPage from './pages/FinderXPage.vue';
-import DownloadPage from './pages/DownloadPage.vue';
 import PrivacyPage from './pages/PrivacyPage.vue';
-import { loadLatestFinderXRelease, FINDERX_RELEASES_URL } from './data/releases.js';
 
 const pages = {
   home: HomePage,
   finderx: FinderXPage,
-  download: DownloadPage,
   privacy: PrivacyPage,
 };
 
@@ -38,24 +35,13 @@ app.directive('reveal', {
         currentObserver.unobserve(entry.target);
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+    element._revealObserver = observer;
     observer.observe(element);
+  },
+  unmounted(element) {
+    element._revealObserver?.disconnect();
+    delete element._revealObserver;
   },
 });
 
 app.mount(root);
-
-if (document.querySelector('[data-release-summary]')) {
-  loadLatestFinderXRelease()
-    .then((release) => {
-      const summary = release ? `${release.name || release.tag_name} · 已发布` : '首个公开版本准备中';
-      document.querySelectorAll('[data-release-summary]').forEach((element) => {
-        element.textContent = summary;
-      });
-    })
-    .catch((error) => {
-      console.warn('Unable to load FinderX release summary:', error);
-      document.querySelectorAll('[data-release-summary]').forEach((element) => {
-        element.innerHTML = `查看 <a href="${FINDERX_RELEASES_URL}" target="_blank" rel="noreferrer">GitHub Releases</a>`;
-      });
-    });
-}
